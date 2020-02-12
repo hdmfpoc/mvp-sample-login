@@ -43,8 +43,10 @@ $ helm delete mongodb-login
 ### login microservice 배포
 $ cd ~/work/mvp-sample-login/deploy   
 $ vi ingress.yaml   
-host정보를 수정합니다.     
-ICP에서는 kubectl get nodes -o wide로 proxy node의 ip를 확인한후, 그 ip로 지정   
+- host정보를 수정합니다.     
+ICP에서는 kubectl get nodes -o wide로 proxy node의 ip를 확인한후, 그 ip로 지정 
+- apiVersion을 수정: ICP는 extensions/v1beta1, vanilla k8s는 networking.k8s.io/v1beta1   
+
 $ kubectl apply -f . 
 
 
