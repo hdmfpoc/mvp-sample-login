@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "mongodb.name" . }}-setup-script
+  labels:
+    app: {{ template "mongodb.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+data:
+  setup.sh: |
+    #!/bin/sh
+    # Setup script to create MongoDB users
+    errorExit () {
+      echo; echo "ERROR: $1"; echo; exit 1
+    }
+    echo "Waiting for mongodb to come up"
+    until mongo --host {{ template "mongodb.fullname" . }} --port {{ .Values.service.port }} --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+    echo "Waiting for db availability"
+    sleep 2
+    done
+    echo "DB ready. Configuring..."
+    mongo --host {{ template "mongodb.fullname" . }} --port {{ .Values.service.port }} -u root -p {{ .Values.mongodbRootPassword }} < /scripts/createMongoDBUsers.js || errorExit "DB user setup failed"
+    echo "DB config done"
+  createMongoDBUsers.js: |
+    // Creating default admin user
+    var adminUser = {
+        user: "{{ .Values.db.adminUser }}",
+        pwd: "{{ .Values.db.adminPassword }}",
+        roles: ["root"],
+        customData: {
+            createdBy: "App installer"
+        }
+    }
+    var adminDb = db.getSiblingDB("admin");
+    if(!adminDb.getUser(adminUser.user)) {
+      adminDb.createUser(adminUser);
+    }
+        
+    // Create custom database
+    var customDb = db.getSiblingDB("{{ .Values.db.name }}");
+    customDb.createCollection("{{ .Values.db.collection }}", { capped : false });
+
+    // Creating default app user
+    var appUser = {
+        user: "{{ .Values.db.nodeUser }}",
+        pwd: "{{ .Values.db.nodePassword }}",
+        roles: ["dbOwner"],
+        customData: {
+            createdBy: "App installer"
+        }
+    }
+    if(!customDb.getUser(appUser.user)) {
+      customDb.createUser(appUser);
+    }
+
