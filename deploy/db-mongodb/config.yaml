@@ -20,7 +20,6 @@ service:
   # clusterIP: None
   port: 27017
   #nodePort: 30001
-
   #externalIPs: [ "169.56.164.245", "169.56.164.244", "169.56.164.254" ]
 
 persistence:
