@@ -31,7 +31,7 @@ $ kubectl config set-context $(kubectl config current-context) --namespace ${NS}
   - NFS dynamic provisioning사용 여부 지정: 사용 시 volume.dynamic에 true로 지정
   - dyamic provisioning 미사용시 NFS server, path 지정: volume.nfs.server, volume.nfs.path지정   
 [예제]
-![](./img/2021-03-30-12-25-33.png)
+![](./img/2021-03-30-12-25-33.png){: width="60%" height="60%"}
 
 - dyamic provisioning 미사용시 volume directory 작성   
   ```
@@ -54,7 +54,7 @@ $ kubectl delete job mongodb-login-create-user
 $ helm delete mongodb-login   
 ```
 
-# login microservice 배포
+# mvp-sample-login microservice 배포
 - deploy/ingress.yaml의 spec.rules.host수정
 ```
 $ cd ~/work/mvp-sample-login/deploy   
