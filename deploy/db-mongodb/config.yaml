@@ -1,0 +1,37 @@
+image:
+  registry: docker.io
+  repository: bitnami/mongodb
+  tag: 4.0.12-debian-9-r22
+  pullPolicy: IfNotPresent
+
+mongodbRootPassword: passw0rd
+
+db:
+  name: db-users
+  collection: users
+  adminUser: dbadmin
+  adminPassword: passw0rd
+  nodeUser: admin
+  nodePassword: passw0rd
+
+## Kubernetes service type
+service:
+  type: ClusterIP
+  # clusterIP: None
+  port: 27017
+  #nodePort: 30001
+
+  #externalIPs: [ "169.56.164.245", "169.56.164.244", "169.56.164.254" ]
+
+persistence:
+  enabled: true
+  mountPath: /bitnami/mongodb
+  storageClass: "nfs-standard"
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  size: 8Gi
+  annotations: {}
+  #nfs:
+  #  server: 169.56.88.117
+  #  path: /data/nfs/mongodb
