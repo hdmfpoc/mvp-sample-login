@@ -73,7 +73,9 @@ $ kubectl get pvc
 $ kubectl get po
 ```
 
-
+# Next Action
+- [mvp-sample-front](https://github.com/happykube/mvp-sample-front.git)를 배포하십시오. 
+- [mvp-sample-bizlogic](https://github.com/happykube/mvp-sample-bizlogic.git)을 배포하십시오.
 
 
 
