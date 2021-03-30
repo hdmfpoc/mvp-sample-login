@@ -31,7 +31,7 @@ $ kubectl config set-context $(kubectl config current-context) --namespace ${NS}
   - NFS dynamic provisioning사용 여부 지정: 사용 시 volume.dynamic에 true로 지정
   - dyamic provisioning 미사용시 NFS server, path 지정: volume.nfs.server, volume.nfs.path지정   
 [예제]
-![](./img/2021-03-30-12-25-33.png){: width="60%" height="60%"}
+![](./img/2021-03-30-12-25-33.png){: width="300" height="250"}
 
 - dyamic provisioning 미사용시 volume directory 작성   
   ```
