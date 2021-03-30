@@ -6,9 +6,13 @@
 # 사전준비
 - k8s cluster에 연결된 PC나 VM에 접근하십시오. 
 - NFS Dynamic provisiong을 사용하려면, [NFS설치와 Dynamic provisiong설정](https://happycloud-lee.tistory.com/178?category=832243)을 참조하십시오. 
-- namespace변수를 만듭니다. 
+- namespace변수를 만듭니다. 아래 예 참조하여 적절히 변경하세요. 
 ```
 $ export NS=mvp-sample
+```
+- container image가 저장될 [Docker image registry](https://hub.docker.com)의 Organization변수를 생성합니다. 아래 예 참조하여 적절히 변경하세요. 
+```
+$ export IMGORG=happykube
 ```
 
 # git clone   
@@ -53,6 +57,23 @@ $ kubectl get pod
 ```
 $ kubectl delete job mongodb-login-create-user   
 $ helm delete mongodb-login   
+```
+
+# mvp-sample-login 컨테이너 이미지 만들기
+- clone한 디렉토리로 이동 
+```
+$ cd ~/work  
+```
+- Build container image 
+```
+$ docker build -f deploy/Dockerfile -t ${IMGORG}/login-api .
+```
+
+- Push image 
+```
+$ docker login 
+
+$ docker push ${IMGORG}/login-api
 ```
 
 # mvp-sample-login microservice 배포
