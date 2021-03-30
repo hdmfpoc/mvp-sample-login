@@ -62,7 +62,15 @@ $ vi ingress.yaml
 
 $ kubectl apply -f . 
 ```
+- PVC바인딩이 되어 있는지 확인
+```
+$ kubectl get pvc
+```
 
+- Pod실행여부 확인
+```
+$ kubectl get po
+```
 
 
 
