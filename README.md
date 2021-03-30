@@ -5,6 +5,7 @@
 
 # 사전준비
 - k8s cluster에 연결된 PC나 VM에 접근하십시오. 
+- NFS Dynamic provisiong을 사용하려면, [NFS설치와 Dynamic provisiong설정](https://happycloud-lee.tistory.com/178?category=832243)을 참조하십시오. 
 - namespace변수를 만듭니다. 
 ```
 $ export NS=mvp-sample
