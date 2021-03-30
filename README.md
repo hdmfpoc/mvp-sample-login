@@ -62,18 +62,18 @@ $ helm delete mongodb-login
 # mvp-sample-login 컨테이너 이미지 만들기
 - clone한 디렉토리로 이동 
 ```
-$ cd ~/work  
+$ cd ~/work/mvp-sample-login 
 ```
 - Build container image 
 ```
-$ docker build -f deploy/Dockerfile -t ${IMGORG}/login-api .
+$ docker build -f deploy/Dockerfile -t ${IMGORG}/login-api:1.0.0 .
 ```
 
 - Push image 
 ```
 $ docker login 
 
-$ docker push ${IMGORG}/login-api
+$ docker push ${IMGORG}/login-api:1.0.0
 ```
 
 # mvp-sample-login microservice 배포
