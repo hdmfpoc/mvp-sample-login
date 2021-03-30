@@ -32,6 +32,7 @@ persistence:
   persistentVolumeReclaimPolicy: Retain
   size: 8Gi
   annotations: {}
+  dynamic: true 
   #nfs:
   #  server: 169.56.88.117
   #  path: /data/nfs/mongodb
