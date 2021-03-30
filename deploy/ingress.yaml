@@ -15,6 +15,5 @@ spec:
             backend:
               service:
                 name: login-api
-              service:
                 port:
                   number: 3000
