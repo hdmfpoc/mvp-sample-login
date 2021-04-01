@@ -5,7 +5,7 @@ var app = express();
 var path = require('path');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-let port = process.env.PORT || 3000;
+let port = process.env.service_port || 3000;
 
 global.__BASEDIR = __dirname + '/';
 var util = require(path.join(__BASEDIR, 'util'));
