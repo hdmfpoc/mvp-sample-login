@@ -6,13 +6,14 @@
 # 사전준비
 - k8s cluster에 연결된 PC나 VM에 접근하십시오. 
 - NFS Dynamic provisiong을 사용하려면, [NFS설치와 Dynamic provisiong설정](https://happycloud-lee.tistory.com/178?category=832243)을 참조하십시오. 
+- [run-cicd 파이프라인](https://happycloud-lee.tistory.com/195?category=832250) 다운로드 
+```
+$ cd ~
+$ git clone https://github.com/happyspringcloud/run-cicd.git
+```
 - namespace변수를 만듭니다. 아래 예 참조하여 적절히 변경하세요. 
 ```
 $ export NS=mvp-sample
-```
-- container image가 저장될 [Docker image registry](https://hub.docker.com)의 Organization변수를 생성합니다. 아래 예 참조하여 적절히 변경하세요. 
-```
-$ export IMGORG=happykube
 ```
 
 # git clone   
@@ -28,6 +29,8 @@ $ cd mvp-sample-login
 ```
 $ kubectl create ns ${NS}   
 $ kubectl config set-context $(kubectl config current-context) --namespace ${NS}
+kubens가 설치되어 있으면 ..
+$ kubens ${NS}
 ```
 
 # mongo db POD 배포   
@@ -59,31 +62,16 @@ $ kubectl delete job mongodb-login-create-user
 $ helm delete mongodb-login   
 ```
 
-# mvp-sample-login 컨테이너 이미지 만들기
-- clone한 디렉토리로 이동 
-```
-$ cd ~/work/mvp-sample-login 
-```
-- Build container image 
-```
-$ docker build -f deploy/Dockerfile -t ${IMGORG}/login-api:1.0.0 .
-```
-
-- Push image 
-```
-$ docker login 
-
-$ docker push ${IMGORG}/login-api:1.0.0
-```
-
 # mvp-sample-login microservice 배포
-- deploy/ingress.yaml의 spec.rules.host수정
-```
-$ cd ~/work/mvp-sample-login/deploy   
-$ vi ingress.yaml  
 
-$ kubectl apply -f . 
+- cicd디렉토리 하위의 cicd-common.properties, cicd-dev.properties, cicd-prod.properties파일 수정 
+
+- run-cicd 실행하고, 값을 적절히 입력 
 ```
+$ cd ~/work/mvp-sample-login
+$ run-cicd
+```
+
 - PVC바인딩이 되어 있는지 확인
 ```
 $ kubectl get pvc
