@@ -110,6 +110,7 @@ node {
             script {
                 sh "ssh bastion mkdir -p ${bastionHome}/cicd/${imageRepository}/deploy"
                 sh "ssh bastion rm -f ${bastionHome}/cicd/${imageRepository}/deploy/* 2>/dev/null"
+                echo "dddddd"
                 sh "ssh bastion ${bastionHome}/run-cicd/cmd/deploy . ${profile} ${bastionHome}/cicd/${imageRepository}"
             }
         }
