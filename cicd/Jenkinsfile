@@ -1,0 +1,129 @@
+
+/* -------- functions ---------- */
+def notifySlack(STATUS, COLOR) {
+/*
+	slackSend (color: COLOR, message: STATUS+" : " +  "${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})")
+*/
+}
+
+def emailRecipients="happycloudpak@gmail.com"
+def notifyMail(STATUS, RECIPIENTS) {
+/*
+	emailext body: STATUS+" : " +  "${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})",
+	subject: STATUS + " : " + "${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+	from: "happycloudpak@gmail.com",
+	to: RECIPIENTS
+*/
+}
+
+/* ------------------------------ */
+
+notifySlack("STARTED", "#FFFF00")
+notifyMail("STARTED", "${emailRecipients}")
+
+//node(label) {
+node {
+    String stageName = ""
+    
+    stageName = "Get Source"	
+    stage(stageName) {
+        echo "**** START : " + stageName
+        
+        git url: "https://github.com/happykbfg/mvp-sample-login.git", branch: "main"
+        // git url: "https://github.com/devJacob01/springcloud.git", branch: "master", credentialsId: "auth_gitlab"	
+    }
+
+    //-- 환경변수 파일 읽어서 변수값 셋팅
+    def props = readProperties  file:"./cicd/cicd-common.properties"  
+
+    def imageRegistry = props["image_registry"]
+    def imageOrganization = props["image_project"]
+    def imageRepository = props["image_repository"]
+    def imageTag = props["image_tag"]
+
+    def dockerRegistry = props["dockerRegistry"]
+    def credentialRegistry=props["credentialRegistry"]
+    
+    def baseDir = props["baseDir"]
+    def skipStages = props["skipStages"]
+    
+    def sonarQubeURL = props["sonarQubeURL"]
+    def sonarQubeLogin = props["sonarQubeLogin"]
+    def sonarQubeProject = props["sonarQubeProject"]
+    
+    def profile = props["profile"]
+
+    //--- runtime parameters
+    devLang = "nodejs"
+    bastionHome = "/root"
+    imageRegUsername = "happycloudpak"
+    imageRegPassword = "happy@cloud"
+    //---
+
+    try {
+        stageName = "Inspection Code"
+        stage(stageName) {
+            echo "**** START : " + stageName
+            if("${skipStages}".contains(stageName)) {
+                echo "Skipped: " + stageName
+            } else {
+                script {
+                    dir("${env.WORKSPACE}/${baseDir}"){  // change directory
+                        sh ("pwd")
+                        sh ("mvn sonar:sonar \
+                            -Dsonar.projectKey=${icpSonarQubeProject}  \
+                            -Dsonar.projectName=${icpSonarQubeProject} \
+                            -Dsonar.host.url=${icpSonarQubeURL} \
+                            -Dsonar.login=${icpSonarQubeLogin}")
+                    }
+                }				
+            }
+        }
+
+        stageName = "Get CI/CD scripts"
+        stage(stageName) {
+            script {
+                sh "cd ${env.WORKSPACE}"
+                sh "if [ -f ${env.WORKSPACE}/run-cicd/cmd/run-cicd ]; then rm -rf run-cicd; fi"
+                sh "git clone https://github.com/happykube/run-cicd.git"
+            }
+        }
+
+        stageName = "Build"
+        stage(stageName) {
+            echo "**** START : " + stageName           
+            script {                
+                sh "cd ${env.WORKSPACE}/${baseDir}"
+                sh "${env.WORKSPACE}/run-cicd/cmd/build-image ${imageRegUsername} ${imageRegPassword} . ${devLang} ${env.WORKSPACE}/run-cicd"
+            }
+        }
+
+        stageName = "Copy CI/CD Scripts to bastion"
+        stage(stageName) {
+            script {
+                sh "ssh bastion mkdir -p ${bastionHome}/cicd/${imageRepository}"
+                sh "ssh bastion rm -rf ${bastionHome}/run-cicd 2>/dev/null"
+                sh "scp -r ${env.WORKSPACE}/run-cicd bastion:${bastionHome}/"
+                sh "scp -r ${env.WORKSPACE}/cicd bastion:${bastionHome}/cicd/${imageRepository}/"
+            }
+        }
+
+        stageName = "Deploy"
+        stage(stageName) {
+            script {
+                sh "ssh bastion mkdir -p ${bastionHome}/cicd/${imageRepository}/deploy"
+                sh "ssh bastion rm -f ${bastionHome}/cicd/${imageRepository}/deploy/* 2>/dev/null"
+                sh "ssh bastion ${bastionHome}/run-cicd/cmd/deploy . ${profile} ${bastionHome}/cicd/${imageRepository}"
+            }
+        }
+        
+        echo "**** FINISH ALL STAGES : SUCESS"
+                    
+        notifySlack("${currentBuild.currentResult}", "#00FF00")
+        notifyMail("${currentBuild.currentResult}", "${emailRecipients}")
+    } catch(e) {
+        currentBuild.result = "FAILED"
+        notifySlack("${currentBuild.currentResult}", "#FF0000")
+        notifyMail("${currentBuild.currentResult}", "${emailRecipients}")			
+    }
+}
