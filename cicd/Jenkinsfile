@@ -21,7 +21,6 @@ def notifyMail(STATUS, RECIPIENTS) {
 notifySlack("STARTED", "#FFFF00")
 notifyMail("STARTED", "${emailRecipients}")
 
-//node(label) {
 node {
     String stageName = ""
     
@@ -29,8 +28,8 @@ node {
     stage(stageName) {
         echo "**** START : " + stageName
         
-        git url: "https://github.com/happykbfg/mvp-sample-login.git", branch: "main"
-        // git url: "https://github.com/devJacob01/springcloud.git", branch: "master", credentialsId: "auth_gitlab"	
+        git url: "https://github.com/happykbfg/mvp-sample-login.git", branch: "main", credentialsId: "credential_github"	
+        
     }
 
     //-- 환경변수 파일 읽어서 변수값 셋팅
@@ -40,7 +39,7 @@ node {
     def imageOrganization = props["image_project"]
     def imageRepository = props["image_repository"]
     def imageTag = props["image_tag"]
-
+    
     def baseDir = props["baseDir"]
     def skipStages = props["skipStages"]
     
@@ -51,10 +50,11 @@ node {
     def profile = props["profile"]
 
     //--- runtime parameters
-    devLang = "nodejs"
-    bastionHome = "/root"
-    imageRegUsername = "happycloudpak"
-    imageRegPassword = "happy@cloud"
+    devLang = props["devlang"]
+    bastionHome = env.bastion_home_dir
+    imageRegUsername = env.image_registry_username_m804
+    imageRegPassword = env.image_registry_password_m804
+    sshidBastion = env.sshid_bastion
     //---
 
     try {
@@ -68,10 +68,10 @@ node {
                     dir("${env.WORKSPACE}/${baseDir}"){  // change directory
                         sh ("pwd")
                         sh ("mvn sonar:sonar \
-                            -Dsonar.projectKey=${icpSonarQubeProject}  \
-                            -Dsonar.projectName=${icpSonarQubeProject} \
-                            -Dsonar.host.url=${icpSonarQubeURL} \
-                            -Dsonar.login=${icpSonarQubeLogin}")
+                            -Dsonar.projectKey=${sonarQubeProject}  \
+                            -Dsonar.projectName=${sonarQubeProject} \
+                            -Dsonar.host.url=${sonarQubeURL} \
+                            -Dsonar.login=${sonarQubeLogin}")
                     }
                 }				
             }
@@ -82,7 +82,7 @@ node {
             script {
                 sh "cd ${env.WORKSPACE}"
                 sh "if [ -f ${env.WORKSPACE}/run-cicd/cmd/run-cicd ]; then rm -rf run-cicd; fi"
-                sh "git clone https://github.com/happykube/run-cicd.git"
+                sh "git clone " + env.run_cicd_git_url
             }
         }
 
@@ -98,20 +98,19 @@ node {
         stageName = "Copy CI/CD Scripts to bastion"
         stage(stageName) {
             script {
-                sh "ssh bastion mkdir -p ${bastionHome}/cicd/${imageRepository}"
-                sh "ssh bastion rm -rf ${bastionHome}/run-cicd 2>/dev/null"
-                sh "scp -r ${env.WORKSPACE}/run-cicd bastion:${bastionHome}/"
-                sh "scp -r ${env.WORKSPACE}/cicd bastion:${bastionHome}/cicd/${imageRepository}/"
+                sh "ssh ${sshidBastion} mkdir -p ${bastionHome}/cicd/${imageRepository}"
+                sh "ssh ${sshidBastion} rm -rf ${bastionHome}/run-cicd 2>/dev/null"
+                sh "scp -r ${env.WORKSPACE}/run-cicd ${sshidBastion}:${bastionHome}/"
+                sh "scp -r ${env.WORKSPACE}/cicd ${sshidBastion}:${bastionHome}/cicd/${imageRepository}/"
             }
         }
 
         stageName = "Deploy"
         stage(stageName) {
             script {
-                sh "ssh bastion mkdir -p ${bastionHome}/cicd/${imageRepository}/deploy"
-                sh "ssh bastion rm -f ${bastionHome}/cicd/${imageRepository}/deploy/* 2>/dev/null"
-                echo "dddddd"
-                sh "ssh bastion ${bastionHome}/run-cicd/cmd/deploy . ${profile} ${bastionHome}/cicd/${imageRepository}"
+                sh "ssh ${sshidBastion} mkdir -p ${bastionHome}/cicd/${imageRepository}/deploy"
+                sh "ssh ${sshidBastion} rm -f ${bastionHome}/cicd/${imageRepository}/deploy/* 2>/dev/null"
+                sh "ssh ${sshidBastion} ${bastionHome}/run-cicd/cmd/deploy . ${profile} ${bastionHome}/cicd/${imageRepository}"
             }
         }
         
