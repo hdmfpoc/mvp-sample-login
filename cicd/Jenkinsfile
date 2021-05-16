@@ -33,23 +33,24 @@ node {
 
     //-- 환경변수 파일 읽어서 변수값 셋팅
     def props = readProperties  file:"./cicd/cicd-common.properties"  
+    def props4jenkins = readProperties  file:"./cicd/jenkins.properties"
 
     def imageRegistry = props["image_registry"]
     def imageOrganization = props["image_project"]
     def imageRepository = props["image_repository"]
     def imageTag = props["image_tag"]
     
-    def baseDir = props["baseDir"]
-    def skipStages = props["skipStages"]
+    def baseDir = props4jenkins["baseDir"]
+    def skipStages = props4jenkins["skipStages"]
     
-    def sonarQubeURL = props["sonarQubeURL"]
-    def sonarQubeLogin = props["sonarQubeLogin"]
-    def sonarQubeProject = props["sonarQubeProject"]
+    def sonarQubeURL = props4jenkins["sonarQubeURL"]
+    def sonarQubeLogin = props4jenkins["sonarQubeLogin"]
+    def sonarQubeProject = props4jenkins["sonarQubeProject"]
     
-    def profile = props["profile"]
+    def profile = props4jenkins["profile"]
 
     //--- runtime parameters
-    devLang = props["devlang"]
+    devLang = props4jenkins["devlang"]
     bastionHome = env.bastion_home_dir
     imageRegUsername = env.image_registry_username_m804
     imageRegPassword = env.image_registry_password_m804
