@@ -1,0 +1,89 @@
+#VERSION:1.2
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mvp-sample-login
+  namespace: user30
+  labels:
+    app: mvp-sample-login
+spec:
+  serviceName: mvp-sample-login
+  
+  selector:
+    matchLabels:
+      app: mvp-sample-login
+  replicas: 1
+  template:
+    metadata:
+      name: mvp-sample-login
+      labels:
+        app: mvp-sample-login
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: mvp-sample-login
+        image: docker.io/happykube/mvp-sample-login:0.0.1
+        imagePullPolicy: Always
+        env:
+        - name: SERVER_PORT
+          value: "3000" 
+        - name: PROFILE
+          value: dev
+        envFrom:
+        - configMapRef:
+            name: "mvp-sample-login-cm"        
+        - secretRef:
+            name: "mvp-sample-login-secret"           
+        ports:
+        - name: containerport
+          containerPort: 3000
+        resources:
+          requests:
+            cpu: 128m
+            memory: 128Mi
+          limits:
+            cpu: 1024m
+            memory: 1024Mi
+        
+          
+            
+            
+          
+          
+          
+          
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mvp-sample-login
+  namespace: user30  
+spec:
+  type: ClusterIP
+  selector:
+    app: mvp-sample-login
+  ports:
+  - name: port1
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: mvp-sample-login
+  namespace: user30  
+spec:
+  rules:
+  - host: {{ SERVICE_HOST }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: mvp-sample-login 
+            port: 
+              number: 3000
