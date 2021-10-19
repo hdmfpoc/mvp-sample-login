@@ -64,7 +64,7 @@ $ helm delete mongodb-login
 
 # mvp-sample-login microservice 배포
 
-- cicd디렉토리 하위의 cicd-common.properties, cicd-dev.properties, cicd-prod.properties파일 수정 
+- cicd디렉토리 하위의 cicd-common.properties 파일 수정: image_project, image_repository, image_tag, namespace, service_host의 IP   
 
 - run-cicd 실행하고, 값을 적절히 입력 
 ```
