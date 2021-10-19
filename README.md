@@ -69,7 +69,8 @@ $ helm delete mongodb-login
 - run-cicd 실행하고, 값을 적절히 입력 
 ```
 $ cd ~/work/mvp-sample-login
-$ run-cicd
+$ run-cicd {image registry login id} {image registry passw0rd} . dev . nodejs
+ex) run-cicd happycloudpak passw0rd . dev . nodejs 
 ```
 
 - PVC바인딩이 되어 있는지 확인
