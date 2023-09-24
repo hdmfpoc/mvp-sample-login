@@ -52,7 +52,7 @@ $ kubens ${NS}
 - helm으로 mongodb 배포
 ```
 $ cd ~/work/mvp-sample-login/deploy/db-mongodb   
-$ helm install mongodb-login .   
+$ helm install login -f config.yaml .   
 $ kubectl get pod   
 ```
 
