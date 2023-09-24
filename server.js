@@ -62,7 +62,7 @@ app.use(function(req, res, next) {
 });
 
 // API
-app.use('/api/users', require(path.join(__BASEDIR, 'api/users')));
+app.use('/api/users', require(path.join(__BASEDIR, '/api/users')));
 app.use('/api/auth', require(path.join(__BASEDIR, '/api/auth')));
 
 // Server
