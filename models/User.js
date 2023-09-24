@@ -59,7 +59,7 @@ userSchema.virtual('newPassword').get(function() {
 });
 
 // password validation
-var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+var passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$/;
 var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination!';
 userSchema.path('password').validate(
 		function(v) {
