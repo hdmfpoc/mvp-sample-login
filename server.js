@@ -46,7 +46,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(function(req, res, next) {
 	let pathname = req.url;
-    util.log("Request for [" + pathname + "] received.");
+    	util.log("Request for [" + pathname + "] received.");
 	
 	if(pathname === "/") {
 		res.writeHead(200, { 'Content-Type':'text/html; charset=utf-8' });
@@ -63,7 +63,7 @@ app.use(function(req, res, next) {
 
 // API
 app.use('/api/users', require(path.join(__BASEDIR, 'api/users')));
-app.use('/api/auth', require(path.join(__BASEDIR, '/api/auth')));
+app.use('/api/auth', require(path.join(__BASEDIR, 'api/auth')));
 
 // Server
 app.listen(port, function() {

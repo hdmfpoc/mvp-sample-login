@@ -22,7 +22,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: mvp-sample-login
-        image: bastion.cmlee.kbstar.local:5005/happykube/mvp-sample-login:0.0.1
+        image: bastion.cmlee.kbstar.local:5005/happykube/mvp-sample-login:0.0.2
         imagePullPolicy: Always
         env:
         - name: SERVER_PORT
